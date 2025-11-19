@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ Nexus Stream | Data Flow Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* --- Nexus Stream Admin Theme --- */
+        :root {
+            --primary-color: #ff00ff; /* Neon Magenta (Accent) */
+            --secondary-color: #00ffff; /* Neon Cyan (Highlight/Success) */
+            --danger: #ff004c; /* Neon Red/Pink (Critical) */
+            --text-color: #f0f0f0; /* Light Text */
+            --dark-text: #0a0a0a; /* Dark Text on bright colors */
+            --light-bg: #0a0a0a; /* Deep Black Background */
+            --container-bg: #1a1a1a; /* Dark Card/Modal Background */
+            --input-bg: #333;
+            --border-color: #555;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            padding: 20px;
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--container-bg);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2); /* Subtle Cyan Glow */
+        }
+
+        h1 {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            text-shadow: 0 0 5px var(--primary-color);
+        }
+        
+        h2 {
+            color: var(--secondary-color);
+            margin-top: 30px;
+            text-shadow: 0 0 3px var(--secondary-color);
+        }
+
+        /* --- Form Styles --- */
+        .product-form {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid var(--primary-color); /* Neon Primary border */
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.4);
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            color: var(--secondary-color);
+        }
+
+        input, textarea {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1em;
+            width: 100%;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            transition: border-color 0.2s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(255, 0, 255, 0.6);
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        /* General Button Styling (Base) */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s, box-shadow 0.2s;
+        }
+        
+        /* Dashboard Return Button (Magenta Accent) */
+        .btn-dashboard {
+            background-color: var(--primary-color);
+            color: var(--dark-text);
+            box-shadow: 0 0 5px rgba(255, 0, 255, 0.6);
+            margin-bottom: 20px;
+        }
+        .btn-dashboard:hover {
+            background-color: #e500e5;
+        }
+
+        /* Submit/Save Button (Primary Magenta) */
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--dark-text);
+        }
+
+        .btn-primary:hover {
+            background-color: #d100d1;
+            box-shadow: 0 0 8px var(--primary-color);
+        }
+
+        /* Cancel/Secondary Button (Grey/Neutral) */
+        .btn-secondary {
+            background-color: #6c757d;
+            color: var(--white);
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        /* --- Product Table Styles --- */
+        #product-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        #product-table th, #product-table td {
+            border: 1px solid #2e2e2e;
+            padding: 12px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+
+        #product-table th {
+            background-color: #222;
+            color: var(--secondary-color);
+            font-weight: bold;
+            text-shadow: 0 0 2px var(--secondary-color);
+        }
+        
+        #product-table tr:nth-child(even) {
+            background-color: #111;
+        }
+        
+        #product-table tr:hover {
+            background-color: #222;
+            transition: background-color 0.2s;
+        }
+        
+        /* Action Buttons in Table */
+        .action-btn {
+            padding: 6px 10px;
+            font-size: 0.8em;
+            margin-right: 5px;
+        }
+
+        .btn-edit { /* Cyan for Edit */
+            background-color: var(--secondary-color);
+            color: var(--dark-text);
+        }
+        .btn-edit:hover {
+            background-color: #00e5e5;
+            box-shadow: 0 0 8px var(--secondary-color);
+        }
+
+        .btn-delete { /* Red/Pink for Delete */
+            background-color: var(--danger);
+            color: var(--text-color);
+        }
+        .btn-delete:hover {
+            background-color: #c0003c;
+            box-shadow: 0 0 8px var(--danger);
+        }
+        
+        /* --- Message Box Styles --- */
+        .message-box {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            display: none;
+            background-color: #1a1a1a;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+        .message-success {
+            color: var(--secondary-color);
+            border: 1px solid var(--secondary-color);
+            text-shadow: 0 0 2px var(--secondary-color);
+        }
+        .message-error {
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            text-shadow: 0 0 2px var(--danger);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-microchip"></i> Nexus Stream | Data Flow Management</h1>
+        <a href="admin-dashboard.html" class="btn btn-dashboard">
+            <i class="fas fa-arrow-left"></i> Return to Root Console
+        </a>
+
+        <h2><span id="form-mode">Add New</span> Data Record</h2>
+        <div class="message-box" id="status-message"></div>
+
+        <form id="product-form" class="product-form">
+            <input type="hidden" id="product-id" name="id">
+
+            <div class="form-group">
+                <label for="name">Record Name (Product)</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="price">Price (₱)</label>
+                <input type="number" id="price" name="price" step="0.01" min="0" required>
+            </div>
+
+            <div class="form-group">
+                <label for="stock">Stock Quantity</label>
+                <input type="number" id="stock" name="stock" min="0" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="imageUrl">Image Data Link (URL)</label>
+                <input type="text" id="imageUrl" name="imageUrl" required>
+            </div>
+
+            <div class="form-group">
+                <label for="category">Category Segment</label>
+                <input type="text" id="category" name="category">
+            </div>
+
+            <div class="form-group full-width">
+                <label for="description">Data Description (Optional)</label>
+                <textarea id="description" name="description" rows="2"></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="submit-btn"><i class="fas fa-upload"></i> Synchronize Record</button>
+                <button type="button" class="btn btn-secondary" id="cancel-btn"><i class="fas fa-times"></i> Clear & Abort Edit</button>
+            </div>
+        </form>
+
+        <h2><i class="fas fa-database"></i> Current Data Flow</h2>
+        <table id="product-table">
+            <thead>
+                <tr>
+                    <th>ID (Partial)</th>
+                    <th>Record Name</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Image Link</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="product-list">
+                </tbody>
+        </table>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:5000/api/products';
+        const productForm = document.getElementById('product-form');
+        const productIdInput = document.getElementById('product-id');
+        const formModeDisplay = document.getElementById('form-mode');
+        const submitBtn = document.getElementById('submit-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const productListBody = document.getElementById('product-list');
+        const statusMessage = document.getElementById('status-message');
+
+        let isEditing = false;
+        
+        // --- Utility Functions ---
+
+        const formatCurrency = (amount) => {
+            return `₱${parseFloat(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        };
+
+        const displayMessage = (message, type = 'success') => {
+            statusMessage.textContent = message;
+            statusMessage.className = `message-box message-${type}`;
+            statusMessage.style.display = 'block';
+            // Hide after 5 seconds
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, 5000);
+        };
+
+        const resetForm = () => {
+            productForm.reset();
+            productIdInput.value = '';
+            formModeDisplay.textContent = 'Add New';
+            submitBtn.innerHTML = '<i class="fas fa-upload"></i> Synchronize Record';
+            cancelBtn.style.display = 'none';
+            isEditing = false;
+        };
+
+        // --- CRUD Functions ---
+
+        // READ: Fetch all products
+        async function fetchAndRenderProducts() {
+            try {
+                const response = await fetch(API_BASE_URL);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch: ${response.status}`);
+                }
+                const products = await response.json();
+                renderProductsTable(products);
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                productListBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--danger); border: 1px solid var(--danger);">
+                    ERROR: Could not connect to the Nexus Stream API at ${API_BASE_URL}. Is the Express server running?
+                </td></tr>`;
+            }
+        }
+
+        // CREATE & UPDATE: Handle form submission
+        productForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const id = productIdInput.value;
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `${API_BASE_URL}/${id}` : API_BASE_URL;
+
+            const formData = {
+                name: document.getElementById('name').value,
+                price: parseFloat(document.getElementById('price').value),
+                stock: parseInt(document.getElementById('stock').value),
+                imageUrl: document.getElementById('imageUrl').value,
+                category: document.getElementById('category').value,
+                description: document.getElementById('description').value || undefined, 
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || result.message || `HTTP status: ${response.status}`);
+                }
+
+                displayMessage(`Data Record ${id ? 'updated' : 'added'} successfully! Stream synchronized.`);
+                resetForm();
+                fetchAndRenderProducts(); // Reload data
+                
+            } catch (error) {
+                console.error("Form Submission Error:", error);
+                displayMessage(`Failed to ${id ? 'update' : 'add'} Data Record: ${error.message}`, 'error');
+            }
+        });
+
+        // EDIT: Load product data into the form
+        window.editProduct = (product) => {
+            // Populate form fields
+            productIdInput.value = product._id;
+            document.getElementById('name').value = product.name;
+            document.getElementById('price').value = product.price;
+            document.getElementById('stock').value = product.stock;
+            document.getElementById('imageUrl').value = product.imageUrl;
+            document.getElementById('category').value = product.category;
+            document.getElementById('description').value = product.description || '';
+            
+            // Update form visuals
+            formModeDisplay.textContent = 'Edit Existing';
+            submitBtn.innerHTML = '<i class="fas fa-sync"></i> Update Data Record';
+            cancelBtn.style.display = 'inline-block';
+            isEditing = true;
+            window.scrollTo(0, 0); // Scroll to the form
+        };
+
+        // DELETE: Remove product
+        window.deleteProduct = async (id, name) => {
+            if (!confirm(`WARNING: Are you sure you want to delete the Data Record "${name}"? This will permanently remove it from the flow.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/${id}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || result.message || `HTTP status: ${response.status}`);
+                }
+
+                displayMessage(`Data Record "${name}" deleted successfully. Flow adjusted.`);
+                fetchAndRenderProducts(); // Reload data
+            } catch (error) {
+                console.error("Delete Error:", error);
+                displayMessage(`Failed to delete Data Record: ${error.message}`, 'error');
+            }
+        };
+
+        // --- Render Logic ---
+
+        function renderProductsTable(products) {
+            productListBody.innerHTML = ''; // Clear table
+            
+            if (products.length === 0) {
+                productListBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No records detected in the data flow. Add a new record above!</td></tr>';
+                return;
+            }
+
+            products.forEach(p => {
+                const row = productListBody.insertRow();
+                row.innerHTML = `
+                    <td>${p._id.substring(0, 4)}...</td>
+                    <td>${p.name}</td>
+                    <td>${formatCurrency(p.price)}</td>
+                    <td>${p.stock}</td>
+                    <td><a href="${p.imageUrl}" target="_blank" style="color: var(--secondary-color);">${p.imageUrl.substring(0, 20)}...</a></td>
+                    <td>
+                        <button class="btn btn-edit action-btn" onclick='editProduct(${JSON.stringify(p)})'>
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-delete action-btn" onclick="deleteProduct('${p._id}', '${p.name}')">
+                            <i class="fas fa-trash-alt"></i> Erase
+                        </button>
+                    </td>
+                `;
+            });
+        }
+        
+        // --- Initialization ---
+        
+        // Event listener to reset form when cancel button is clicked
+        cancelBtn.addEventListener('click', resetForm);
+
+        // Initial fetch when the page loads
+        document.addEventListener('DOMContentLoaded', fetchAndRenderProducts);
+    </script>
+</body>
+</html>

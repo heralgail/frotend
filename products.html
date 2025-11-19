@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Nexus -Tech Inventory</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* --- Root and Global Styles --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Nexus/Cyber Palette */
+            --primary-color: #00bcd4; /* Electric Blue (Main Accent) */
+            --secondary-color: #007c91; /* Darker Cyan/Blue for emphasis */
+            --text-color: #ffffff; /* Crisp White Text */
+            --dark-bg: #1a1a1a; /* Dark Grey/Black Background */
+            --card-bg: #2c2c2c; /* Slightly Lighter Dark Card Background */
+            --light-bg: #383838; /* Used for borders/dividers */
+            --low-stock: #ff9800; /* Amber Warning */
+            --danger: #e91e63; /* Pink/Red Danger */
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--dark-bg);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            color: var(--text-color);
+        }
+
+        /* --- Header/Nav --- */
+        .main-header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--light-bg);
+            padding: 15px 30px; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        .store-name a {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: var(--primary-color); 
+            text-decoration: none;
+            text-transform: uppercase;
+        }
+        .main-header a:not(.store-name a) {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .main-header a:not(.store-name a):hover {
+            color: var(--text-color);
+        }
+
+        /* --- Main Layout & Products Grid --- */
+        .main-container {
+            display: flex;
+            flex-grow: 1;
+        }
+
+        .product-area {
+            flex: 3;
+            padding: 0; 
+            max-width: 1200px;
+        }
+        
+        .section-title {
+            margin: 30px 20px;
+            font-size: 2em;
+            color: var(--primary-color);
+            text-align: center;
+            text-shadow: 0 0 5px rgba(0, 188, 212, 0.5); /* Glowing effect */
+            font-weight: 300;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px; 
+            padding: 0 20px 30px 20px;
+        }
+
+        .product-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--light-bg);
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s, border-color 0.3s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 6px 15px rgba(0, 188, 212, 0.3);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 180px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            object-fit: cover;
+            border: 1px solid var(--light-bg);
+        }
+
+        .product-title {
+            font-size: 1.1em;
+            color: var(--text-color);
+            margin-bottom: 5px;
+        }
+        
+        .product-description {
+            font-size: 0.85em;
+            color: #ccc;
+            margin-bottom: 10px;
+            height: 1.2em;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        
+        /* --- Stock Availability Styles --- */
+        .product-stock {
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #4caf50; /* Light Green for OK */
+        }
+
+        .low-stock {
+            color: var(--low-stock); /* Amber Warning */
+        }
+
+        .out-of-stock {
+            color: var(--danger); /* Red Danger */
+        }
+        /* --- End Stock Styles --- */
+
+
+        .product-price {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+        }
+
+        .add-to-cart-btn {
+            background-color: var(--primary-color);
+            color: var(--dark-bg);
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s, transform 0.1s;
+            font-size: 1em;
+            font-weight: 600;
+        }
+        .add-to-cart-btn:hover {
+            background-color: var(--text-color);
+            color: var(--dark-bg);
+        }
+        .add-to-cart-btn:disabled {
+            background-color: #444;
+            color: #888;
+            cursor: not-allowed;
+        }
+
+
+        /* --- Cart Sidebar --- */
+        .cart-sidebar {
+            flex: 1; 
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-left: 2px solid var(--primary-color);
+            position: sticky;
+            top: 0;
+            height: 100vh; 
+            overflow-y: auto;
+        }
+
+        .cart-sidebar h3 {
+            color: var(--text-color);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            font-size: 1.4em;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--light-bg);
+            font-size: 0.95em;
+        }
+
+        .cart-item button {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 1em;
+            margin-left: 10px;
+        }
+        
+        .cart-summary {
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 2px solid var(--primary-color);
+            font-size: 1.2em;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            color: var(--primary-color);
+        }
+        
+        .checkout-btn {
+            width: 100%;
+            margin-top: 25px;
+            padding: 15px;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 4px;
+            font-size: 1.1em;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        .checkout-btn:hover {
+            background-color: var(--primary-color);
+        }
+        .checkout-btn:disabled {
+            background-color: #444;
+            border-color: #666;
+            color: #888;
+        }
+        
+        /* --- Modal/Lightbox Styles --- */
+        .modal {
+            background-color: rgba(0, 0, 0, 0.95); 
+        }
+        .modal-caption {
+            color: #ccc;
+        }
+        .close {
+            color: var(--primary-color);
+        }
+        .close:hover,
+        .close:focus {
+            color: var(--danger);
+        }
+
+        /* Animation */
+        @keyframes zoom {
+            from {transform: scale(0.1)} 
+            to {transform: scale(1)}
+        }
+        
+        /* --- Responsive Adjustments --- */
+        @media (max-width: 900px) {
+            .main-container {
+                flex-direction: column;
+            }
+            .cart-sidebar {
+                position: relative;
+                height: auto;
+                flex: none;
+                order: -1; 
+                border-left: none;
+                border-bottom: 2px solid var(--primary-color);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        
+        <div class="cart-sidebar">
+            <h3><i class="fas fa-shopping-basket"></i> Acquisition Cart</h3>
+            
+            <div id="cart-items">
+                <p id="empty-cart-message" class="text-muted" style="color: #999;">Cart system offline. Initiate item acquisition.</p>
+            </div>
+            
+            <div class="cart-summary">
+                <span>TOTAL COST:</span>
+                <span id="cart-total">₱0.00</span>
+            </div>
+
+            <button class="checkout-btn" id="checkout-btn" disabled>
+                <i class="fas fa-credit-card"></i> Process Transaction
+            </button>
+        </div>
+
+        <div class="product-area">
+            <header class="main-header">
+                <div class="store-name">
+                    <a href="index.html">THE NEXUS</a>
+                </div>
+                <a href="signup.html">
+                    <i class="fas fa-user-circle"></i> Profile Access
+                </a>
+            </header>
+
+            <h2 class="section-title">✨ :: CURRENT INVENTORY MANIFEST :: ✨</h2>
+
+            <div class="product-grid" id="product-list">
+                </div>
+        </div>
+    </div>
+    
+    <div id="imageModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modalImage">
+        <div id="modalCaption" class="modal-caption"></div>
+    </div>
+    <script>
+    // --- Configuration ---
+    const API_BASE_URL = 'http://localhost:5000/api';
+
+    // --- State and Element References ---
+    let cart = JSON.parse(localStorage.getItem('everglowCart')) || []; 
+    const cartItemsContainer = document.getElementById('cart-items');
+    const cartTotalDisplay = document.getElementById('cart-total');
+    const checkoutBtn = document.getElementById('checkout-btn');
+    const emptyCartMessage = document.getElementById('empty-cart-message');
+    const productList = document.getElementById('product-list');
+    const sectionTitle = document.querySelector('.section-title');
+
+    // MODAL REFERENCES
+    const modal = document.getElementById('imageModal');
+    const modalImg = document.getElementById('modalImage');
+    const modalCaption = document.getElementById('modalCaption');
+    const closeBtn = document.querySelector('.close');
+
+
+    // --- Utility Functions ---
+    const formatCurrency = (amount) => {
+        return `₱${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    };
+    
+    // --- Modal Functions ---
+    window.openModal = function(imageUrl, name) {
+        modal.style.display = "block";
+        modalImg.src = imageUrl;
+        modalCaption.innerHTML = name;
+    }
+
+    closeBtn.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+    
+    // --- Core Functions for Data Fetching and Rendering ---
+
+    // 1. Fetch Products from Backend
+    async function fetchProducts() {
+        try {
+            sectionTitle.innerHTML = "✨ :: INVENTORY FETCHING INITIATED :: ✨";
+            const response = await fetch(`${API_BASE_URL}/products`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return await response.json(); 
+        } catch (error) {
+            console.error("Error fetching products:", error);
+            productList.innerHTML = `<p style="text-align: center; color: var(--danger); padding: 20px;">
+                ❌ Connection to THE NEXUS database failed. Verify API endpoint availability.
+            </p>`;
+            sectionTitle.innerHTML = `<i class="fas fa-times-circle"></i> SYSTEM OFFLINE`;
+            return [];
+        }
+    }
+
+    // 2. Render Products Grid 
+    function renderProducts(products) {
+        sectionTitle.innerHTML = `✨ :: CURRENT INVENTORY MANIFEST: ${products.length} UNITS AVAILABLE :: ✨`;
+
+        productList.innerHTML = products.map(p => {
+            
+            // --- Logic for Stock Status ---
+            let stockClass = 'product-stock';
+            let stockText = `Stock: ${p.stock}`;
+            let buttonDisabled = false;
+
+            if (p.stock === 0) {
+                stockClass += ' out-of-stock';
+                stockText = 'STATUS: DEPLETED';
+                buttonDisabled = true;
+            } else if (p.stock > 0 && p.stock <= 5) {
+                stockClass += ' low-stock';
+                stockText = `WARNING: ${p.stock} REMAINING`;
+            }
+            // --- End Stock Logic ---
+            
+            return `
+                <div class="product-card">
+                    <a href="javascript:void(0)" 
+                        onclick="openModal('${p.imageUrl}', '${p.name}')" 
+                        class="product-image-link">
+                        <img src="${p.imageUrl}" alt="${p.name}" class="product-image">
+                    </a>
+                    
+                    <h3 class="product-title">${p.name}</h3>
+                    
+                    <p class="product-description">${p.description || 'Data stream incomplete. Item details pending.'}</p>
+                    
+                    <p class="${stockClass}">${stockText}</p>
+
+                    <p class="product-price">${formatCurrency(p.price)}</p>
+                    
+                    <button 
+                        class="add-to-cart-btn" 
+                        onclick="addToCart('${p._id}', '${p.name}', ${p.price}, ${p.stock})"
+                        ${buttonDisabled ? 'disabled' : ''}
+                        title="${buttonDisabled ? 'Acquisition disabled: Stock Depleted' : 'Add to Acquisition Cart'}"
+                    >
+                        <i class="fas fa-cart-plus"></i> ${buttonDisabled ? 'DEPLETED' : 'ACQUIRE UNIT'}
+                    </button>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // 3. Render Cart Sidebar (Themed text/icons)
+    function renderCart() {
+        cartItemsContainer.innerHTML = '';
+        let total = 0;
+
+        if (cart.length === 0) {
+            emptyCartMessage.style.display = 'block';
+            checkoutBtn.disabled = true;
+        } else {
+            emptyCartMessage.style.display = 'none';
+            checkoutBtn.disabled = false;
+            
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+                
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'cart-item';
+                itemDiv.innerHTML = `
+                    <span style="color: var(--primary-color);">${item.name} <span style="color: var(--text-color);">(x${item.quantity})</span></span>
+                    <div>
+                        <span>${formatCurrency(itemTotal)}</span>
+                        <button onclick="deleteItem(${index})" title="Remove item from acquisition list">
+                            <i class="fas fa-minus-circle"></i>
+                        </button>
+                    </div>
+                `;
+                cartItemsContainer.appendChild(itemDiv);
+            });
+        }
+
+        cartTotalDisplay.textContent = formatCurrency(total);
+        localStorage.setItem('everglowCart', JSON.stringify(cart));
+    }
+
+    // 4. Add to Cart (Logic unchanged)
+    function addToCart(productId, name, price, availableStock) {
+        const cartItem = cart.find(item => item.id === productId);
+
+        if (cartItem) {
+            if (cartItem.quantity < availableStock) {
+                cartItem.quantity += 1;
+                console.log(`Unit ${name} quantity increased. Total in cart: ${cartItem.quantity}`);
+            } else {
+                alert(`⚠️ LIMIT REACHED: Acquisition of unit "${name}" halted. Maximum ${availableStock} units available.`);
+            }
+        } else {
+            if (availableStock > 0) {
+                cart.push({ id: productId, name, price, quantity: 1 });
+                console.log(`Unit ${name} added to acquisition cart!`);
+            } else {
+                alert(`Unit ${name} is depleted.`);
+            }
+        }
+
+        renderCart();
+    }
+
+    // 5. Delete Item (Logic unchanged)
+    function deleteItem(index) {
+        const itemName = cart[index].name;
+        cart.splice(index, 1); 
+        renderCart();
+        console.log(`Unit ${itemName} removed from acquisition list.`);
+    }
+
+    // 6. Checkout (Logic unchanged)
+    function checkout() {
+        if (cart.length > 0) {
+            localStorage.setItem('everglowCart', JSON.stringify(cart));
+            window.location.href = "payment.html";
+        } else {
+            alert("Acquisition cart is empty. Please select units to proceed.");
+        }
+    }
+
+
+    // --- Global Functions (Needed because they are called from inline HTML) ---
+    window.addToCart = addToCart;
+    window.deleteItem = deleteItem;
+
+    // --- Event Listeners and Initial Load ---
+    checkoutBtn.addEventListener('click', checkout);
+    
+    // Initial load: Fetch data asynchronously before rendering
+    window.onload = async () => {
+        const fetchedProducts = await fetchProducts();
+        renderProducts(fetchedProducts);
+        renderCart();
+    };
+    
+</script>
+</body>
+</html>
