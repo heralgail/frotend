@@ -163,6 +163,46 @@
             border-color: var(--secondary-color);
         }
 
+        /* --- Map Style Addition --- */
+        .store-map-container {
+            position: relative; /* CRUCIAL: Enables absolute positioning for the marker */
+            margin: 40px auto 60px; /* Separates the map from surrounding content */
+            width: 100%;
+            max-width: 900px; /* Constraints the map width for better presentation */
+            height: 450px; /* Defined height for the map iframe */
+            border: 3px solid var(--primary-color);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5); /* Stronger neon glow around the map */
+            overflow: hidden;
+            border-radius: 8px;
+        }
+        .store-map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* --- NEW: Location Indicator/Marker Styles --- */
+        .store-marker {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -100%); /* Centers the icon and pulls it up so the point is exactly at 50% */
+            font-size: 3.5em; /* Large icon */
+            color: var(--secondary-color); /* Neon Magenta to contrast with the Cyan border */
+            text-shadow: 0 0 10px var(--secondary-color), 0 0 20px rgba(255, 0, 255, 0.5); /* Strong marker glow */
+            z-index: 100; /* Ensure it floats above the iframe */
+            animation: pulse 1.5s infinite; /* Subtle pulsing animation */
+        }
+
+        /* Keyframe for the pulse effect */
+        @keyframes pulse {
+            0% { transform: translate(-50%, -100%) scale(1); opacity: 1; }
+            50% { transform: translate(-50%, -110%) scale(1.05); opacity: 0.8; }
+            100% { transform: translate(-50%, -100%) scale(1); opacity: 1; }
+        }
+        /* --- END: NEW Marker Styles --- */
+
+
         /* --- Main Content & Products --- */
         .main-content {
             padding: 40px 20px; 
@@ -182,6 +222,7 @@
         }
 
         .product-grid {
+            display: grid; /* Added missing display property */
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); 
             gap: 30px; 
         }
@@ -202,6 +243,7 @@
 
         .product-image {
             height: 200px;
+            width: 100%; /* Ensure image fills container */
             margin-bottom: 12px;
             object-fit: cover; 
             background-color: #111;
@@ -233,6 +275,7 @@
             text-transform: uppercase;
             border: none;
             transition: background-color 0.2s, box-shadow 0.2s;
+            width: 100%; /* Ensure button fills container width */
         }
         .add-to-cart-btn:hover {
             background-color: var(--button-hover); 
@@ -246,6 +289,20 @@
             padding: 40px 20px 25px;
             margin-top: 40px;
             border-top: 2px solid var(--primary-color);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto 30px;
+        }
+
+        .footer-column {
+            flex-basis: 22%; /* Adjust for 4 columns */
+            min-width: 200px;
+            margin-bottom: 20px;
         }
 
         .footer-column h4 {
@@ -265,6 +322,7 @@
 
         .footer-column a {
             color: var(--light-text-color);
+            text-decoration: none;
         }
 
         .footer-column a:hover {
@@ -275,7 +333,31 @@
             border-top: 1px solid #333;
             color: #555;
             letter-spacing: 1px;
+            text-align: center;
+            padding-top: 20px;
+            font-size: 0.8em;
         }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .footer-column {
+                flex-basis: 45%;
+            }
+        }
+        @media (max-width: 576px) {
+            .footer-column {
+                flex-basis: 100%;
+                text-align: center;
+            }
+            .main-header {
+                flex-direction: column;
+                padding: 15px;
+            }
+            .header-actions {
+                margin-top: 10px;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -316,7 +398,20 @@
     <main class="main-content">
         <h2 class="section-title">Velocity & Vision: Featured Hardware</h2>
         
+        <h3 class="section-title" style="margin-top: 60px; font-size: 1.8em; letter-spacing: 2px;">
+            <i class="fas fa-map-marker-alt" style="color: var(--secondary-color);"></i> Find Our Core Hub
+        </h3>
         
+        <div class="store-map-container">
+            <i class="fas fa-satellite-dish store-marker" title="Nexus Stream Location inside Gaisano Capital"></i>
+            
+            <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15757.258814717208!2d123.43577313382947!3d7.824707172551528!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x325608b49e89d891%3A0x6758654c609c2a79!2sGaisano%20Capital%20Pagadian!5e0!3m2!1sen!2sph!4v1700812700547!5m2!1sen!2sph"
+                allowfullscreen="" 
+                loading="lazy" 
+                referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+        </div>
         <div class="product-grid">
             
             <div class="product-card">
